@@ -15,7 +15,7 @@
     mc:Ignorable="d">
 
     <Window.Resources>
-        <!--  按键样式  -->
+        <!-- 基础按键样式 -->
         <Style x:Key="KeyStyle" TargetType="Button">
             <Setter Property="Background" Value="#FF2D2D30" />
             <Setter Property="Foreground" Value="#FFFFFF" />
@@ -26,8 +26,8 @@
             <Setter Property="FontWeight" Value="Medium" />
             <Setter Property="Margin" Value="1" />
             <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="MinWidth" Value="30" />
-            <Setter Property="MinHeight" Value="30" />
+            <Setter Property="Width" Value="50" />
+            <Setter Property="Height" Value="40" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -49,7 +49,6 @@
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="border" Property="Background" Value="#FF007ACC" />
-                                <Setter Property="Foreground" Value="#FFFFFF" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -57,19 +56,13 @@
             </Setter>
         </Style>
 
-        <!--  大按键样式 (Space, Shift等)  -->
-        <Style
-            x:Key="LargeKeyStyle"
-            BasedOn="{StaticResource KeyStyle}"
-            TargetType="Button">
+        <!-- 大按键样式 -->
+        <Style x:Key="LargeKeyStyle" BasedOn="{StaticResource KeyStyle}" TargetType="Button">
             <Setter Property="FontSize" Value="9" />
         </Style>
 
-        <!--  功能键样式  -->
-        <Style
-            x:Key="FunctionKeyStyle"
-            BasedOn="{StaticResource KeyStyle}"
-            TargetType="Button">
+        <!-- 功能键样式 -->
+        <Style x:Key="FunctionKeyStyle" BasedOn="{StaticResource KeyStyle}" TargetType="Button">
             <Setter Property="Background" Value="#FF404040" />
             <Setter Property="FontSize" Value="9" />
         </Style>
@@ -82,907 +75,228 @@
             <RowDefinition Height="40" />
         </Grid.RowDefinitions>
 
-        <!--  标题栏  -->
-        <Border
-            Grid.Row="0"
-            Background="#FF252526"
-            BorderBrush="#FF404040"
-            BorderThickness="0,0,0,1">
+        <!-- 标题栏 -->
+        <Border Background="#FF252526" BorderBrush="#FF404040" BorderThickness="0,0,0,1">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock
                     Margin="0,5,0,2"
-                    HorizontalAlignment="Center"
                     FontSize="24"
                     FontWeight="Light"
                     Foreground="#FFFFFF"
                     Text="键盘检测器 - 全局按键检测" />
                 <TextBlock
                     Margin="0,0,0,5"
-                    HorizontalAlignment="Center"
                     FontSize="12"
                     Foreground="#FF00FF00"
                     Text="已开启全局按键检测，无需窗口焦点也能检测按键" />
             </StackPanel>
         </Border>
 
-        <!--  键盘主体  -->
-        <ScrollViewer
-            Grid.Row="1"
-            HorizontalScrollBarVisibility="Disabled"
-            VerticalScrollBarVisibility="Auto">
-            <Grid Margin="10">
-                <!--  使用WrapPanel实现自动换行  -->
-                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled">
-                    <WrapPanel
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Orientation="Horizontal">
+        <!-- 键盘主体 -->
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <WrapPanel Margin="10" HorizontalAlignment="Center" VerticalAlignment="Center">
 
-                        <!--  主键盘区域  -->
-                        <Border
-                            Margin="5"
-                            Padding="10"
-                            BorderBrush="#FF404040"
-                            BorderThickness="1"
-                            CornerRadius="8">
-                            <Viewbox
-                                MaxWidth="800"
-                                MaxHeight="300"
-                                Stretch="Uniform"
-                                StretchDirection="DownOnly">
+                <!-- 主键盘区域 -->
+                <Border Margin="5" Padding="10" BorderBrush="#FF404040" BorderThickness="1" CornerRadius="8">
+                    <Viewbox MaxWidth="800" MaxHeight="300" Stretch="Uniform" StretchDirection="DownOnly">
+                        <StackPanel>
+                            <!-- 功能键行 -->
+                            <UniformGrid Margin="0,0,0,5" Columns="15">
+                                <Button x:Name="Escape" Content="Esc" Style="{StaticResource FunctionKeyStyle}" />
+                                <Button x:Name="F1" Content="F1" Style="{StaticResource FunctionKeyStyle}" />
+                                <Button x:Name="F2" Content="F2" Style="{StaticResource FunctionKeyStyle}" />
+                                <Button x:Name="F3" Content="F3" Style="{StaticResource FunctionKeyStyle}" />
+                                <Button x:Name="F4" Content="F4" Style="{StaticResource FunctionKeyStyle}" />
+                                <Border />
+                                <Button x:Name="F5" Content="F5" Style="{StaticResource FunctionKeyStyle}" />
+                                <Button x:Name="F6" Content="F6" Style="{StaticResource FunctionKeyStyle}" />
+                                <Button x:Name="F7" Content="F7" Style="{StaticResource FunctionKeyStyle}" />
+                                <Button x:Name="F8" Content="F8" Style="{StaticResource FunctionKeyStyle}" />
+                                <Border />
+                                <Button x:Name="F9" Content="F9" Style="{StaticResource FunctionKeyStyle}" />
+                                <Button x:Name="F10" Content="F10" Style="{StaticResource FunctionKeyStyle}" />
+                                <Button x:Name="F11" Content="F11" Style="{StaticResource FunctionKeyStyle}" />
+                                <Button x:Name="F12" Content="F12" Style="{StaticResource FunctionKeyStyle}" />
+                            </UniformGrid>
 
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
+                            <!-- 数字键行 -->
+                            <StackPanel Margin="0,2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button x:Name="Tilde" Content="~`" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="D1" Content="1!" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="D2" Content="2@" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="D3" Content="3#" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="D4" Content="4$" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="D5" Content="5%" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="D6" Content="6^" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="D7" Content="7&amp;" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="D8" Content="8*" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="D9" Content="9(" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="D0" Content="0)" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="Minus" Content="-_" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="Plus" Content="=+" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="Backspace" Content="Backspace" Width="80" Style="{StaticResource LargeKeyStyle}" />
+                            </StackPanel>
 
-                                    <!--  第一行：ESC键和功能键 F1-F12  -->
-                                    <UniformGrid
-                                        Grid.Row="0"
-                                        Margin="0,0,0,5"
-                                        Columns="15"
-                                        Rows="1">
-                                        <Button
-                                            x:Name="Escape"
-                                            Content="Esc"
-                                            Style="{StaticResource FunctionKeyStyle}" />
-                                        <Button
-                                            x:Name="F1"
-                                            Content="F1"
-                                            Style="{StaticResource FunctionKeyStyle}" />
-                                        <Button
-                                            x:Name="F2"
-                                            Content="F2"
-                                            Style="{StaticResource FunctionKeyStyle}" />
-                                        <Button
-                                            x:Name="F3"
-                                            Content="F3"
-                                            Style="{StaticResource FunctionKeyStyle}" />
-                                        <Button
-                                            x:Name="F4"
-                                            Content="F4"
-                                            Style="{StaticResource FunctionKeyStyle}" />
-                                        <Rectangle Fill="Transparent" />
-                                        <Button
-                                            x:Name="F5"
-                                            Content="F5"
-                                            Style="{StaticResource FunctionKeyStyle}" />
-                                        <Button
-                                            x:Name="F6"
-                                            Content="F6"
-                                            Style="{StaticResource FunctionKeyStyle}" />
-                                        <Button
-                                            x:Name="F7"
-                                            Content="F7"
-                                            Style="{StaticResource FunctionKeyStyle}" />
-                                        <Button
-                                            x:Name="F8"
-                                            Content="F8"
-                                            Style="{StaticResource FunctionKeyStyle}" />
-                                        <Rectangle Fill="Transparent" />
-                                        <Button
-                                            x:Name="F9"
-                                            Content="F9"
-                                            Style="{StaticResource FunctionKeyStyle}" />
-                                        <Button
-                                            x:Name="F10"
-                                            Content="F10"
-                                            Style="{StaticResource FunctionKeyStyle}" />
-                                        <Button
-                                            x:Name="F11"
-                                            Content="F11"
-                                            Style="{StaticResource FunctionKeyStyle}" />
-                                        <Button
-                                            x:Name="F12"
-                                            Content="F12"
-                                            Style="{StaticResource FunctionKeyStyle}" />
-                                    </UniformGrid>
+                            <!-- QWERTY行 -->
+                            <StackPanel Margin="0,2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button x:Name="Tab" Content="Tab" Width="70" Style="{StaticResource LargeKeyStyle}" />
+                                <Button x:Name="Q" Content="Q" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="W" Content="W" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="E" Content="E" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="R" Content="R" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="T" Content="T" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="Y" Content="Y" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="U" Content="U" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="I" Content="I" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="O" Content="O" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="P" Content="P" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="LeftBracket" Content="[{" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="RightBracket" Content="]}" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="Backslash" Content="\|" Width="60" Style="{StaticResource KeyStyle}" />
+                            </StackPanel>
 
-                                    <!--  第二行：数字键行  -->
-                                    <Grid Grid.Row="1" Margin="0,2">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="1.6*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Button
-                                            x:Name="Tilde"
-                                            Grid.Column="0"
-                                            Content="~`"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="D1"
-                                            Grid.Column="1"
-                                            Content="1!"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="D2"
-                                            Grid.Column="2"
-                                            Content="2@"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="D3"
-                                            Grid.Column="3"
-                                            Content="3#"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="D4"
-                                            Grid.Column="4"
-                                            Content="4$"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="D5"
-                                            Grid.Column="5"
-                                            Content="5%"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="D6"
-                                            Grid.Column="6"
-                                            Content="6^"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="D7"
-                                            Grid.Column="7"
-                                            Content="7&amp;"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="D8"
-                                            Grid.Column="8"
-                                            Content="8*"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="D9"
-                                            Grid.Column="9"
-                                            Content="9("
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="D0"
-                                            Grid.Column="10"
-                                            Content="0)"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="Minus"
-                                            Grid.Column="11"
-                                            Content="-_"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="Plus"
-                                            Grid.Column="12"
-                                            Content="=+"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="Backspace"
-                                            Grid.Column="13"
-                                            Content="Backspace"
-                                            Style="{StaticResource LargeKeyStyle}" />
-                                    </Grid>
+                            <!-- ASDF行 -->
+                            <StackPanel Margin="0,2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button x:Name="CapsLock" Content="Caps Lock" Width="80" Style="{StaticResource LargeKeyStyle}" />
+                                <Button x:Name="A" Content="A" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="S" Content="S" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="D" Content="D" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="F" Content="F" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="G" Content="G" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="H" Content="H" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="J" Content="J" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="K" Content="K" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="L" Content="L" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="Semicolon" Content=";:" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="Quote" Content="'&quot;" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="Enter" Content="Enter" Width="90" Style="{StaticResource LargeKeyStyle}" />
+                            </StackPanel>
 
-                                    <!--  第三行：QWERTY行  -->
-                                    <Grid Grid.Row="2" Margin="0,2">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="1.4*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="1.2*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Button
-                                            x:Name="Tab"
-                                            Grid.Column="0"
-                                            Content="Tab"
-                                            Style="{StaticResource LargeKeyStyle}" />
-                                        <Button
-                                            x:Name="Q"
-                                            Grid.Column="1"
-                                            Content="Q"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="W"
-                                            Grid.Column="2"
-                                            Content="W"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="E"
-                                            Grid.Column="3"
-                                            Content="E"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="R"
-                                            Grid.Column="4"
-                                            Content="R"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="T"
-                                            Grid.Column="5"
-                                            Content="T"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="Y"
-                                            Grid.Column="6"
-                                            Content="Y"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="U"
-                                            Grid.Column="7"
-                                            Content="U"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="I"
-                                            Grid.Column="8"
-                                            Content="I"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="O"
-                                            Grid.Column="9"
-                                            Content="O"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="P"
-                                            Grid.Column="10"
-                                            Content="P"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="LeftBracket"
-                                            Grid.Column="11"
-                                            Content="[{"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="RightBracket"
-                                            Grid.Column="12"
-                                            Content="]}"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="Backslash"
-                                            Grid.Column="13"
-                                            Content="\|"
-                                            Style="{StaticResource KeyStyle}" />
-                                    </Grid>
+                            <!-- ZXCV行 -->
+                            <StackPanel Margin="0,2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button x:Name="LeftShift" Content="Shift" Width="100" Style="{StaticResource LargeKeyStyle}" />
+                                <Button x:Name="Z" Content="Z" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="X" Content="X" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="C" Content="C" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="V" Content="V" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="B" Content="B" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="N" Content="N" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="M" Content="M" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="Comma" Content=",&lt;" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="Period" Content=".&gt;" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="Slash" Content="/?" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="RightShift" Content="Shift" Width="100" Style="{StaticResource LargeKeyStyle}" />
+                            </StackPanel>
 
-                                    <!--  第四行：ASDF行  -->
-                                    <StackPanel
-                                        Grid.Row="3"
-                                        HorizontalAlignment="Center"
-                                        Orientation="Horizontal">
-                                        <Button
-                                            x:Name="CapsLock"
-                                            Width="80"
-                                            Height="40"
-                                            Content="Caps Lock"
-                                            Style="{StaticResource LargeKeyStyle}" />
-                                        <Button
-                                            x:Name="A"
-                                            Width="50"
-                                            Height="40"
-                                            Content="A"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="S"
-                                            Width="50"
-                                            Height="40"
-                                            Content="S"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="D"
-                                            Width="50"
-                                            Height="40"
-                                            Content="D"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="F"
-                                            Width="50"
-                                            Height="40"
-                                            Content="F"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="G"
-                                            Width="50"
-                                            Height="40"
-                                            Content="G"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="H"
-                                            Width="50"
-                                            Height="40"
-                                            Content="H"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="J"
-                                            Width="50"
-                                            Height="40"
-                                            Content="J"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="K"
-                                            Width="50"
-                                            Height="40"
-                                            Content="K"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="L"
-                                            Width="50"
-                                            Height="40"
-                                            Content="L"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="Semicolon"
-                                            Width="50"
-                                            Height="40"
-                                            Content=";:"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="Quote"
-                                            Width="50"
-                                            Height="40"
-                                            Content="'&quot;"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="Enter"
-                                            Width="90"
-                                            Height="40"
-                                            Content="Enter"
-                                            Style="{StaticResource LargeKeyStyle}" />
-                                    </StackPanel>
+                            <!-- 底部控制键 -->
+                            <StackPanel Margin="0,10,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button x:Name="LeftCtrl" Content="Ctrl" Width="70" Style="{StaticResource LargeKeyStyle}" />
+                                <Button x:Name="LeftWin" Content="Win" Width="60" Style="{StaticResource LargeKeyStyle}" />
+                                <Button x:Name="LeftAlt" Content="Alt" Width="60" Style="{StaticResource LargeKeyStyle}" />
+                                <Button x:Name="Space" Content="Space" Width="300" Style="{StaticResource LargeKeyStyle}" />
+                                <Button x:Name="RightAlt" Content="Alt" Width="60" Style="{StaticResource LargeKeyStyle}" />
+                                <Button x:Name="Menu" Content="Menu" Width="60" Style="{StaticResource LargeKeyStyle}" />
+                                <Button x:Name="RightCtrl" Content="Ctrl" Width="70" Style="{StaticResource LargeKeyStyle}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Viewbox>
+                </Border>
 
-                                    <!--  第五行：ZXCV行  -->
-                                    <StackPanel
-                                        Grid.Row="4"
-                                        HorizontalAlignment="Center"
-                                        Orientation="Horizontal">
-                                        <Button
-                                            x:Name="LeftShift"
-                                            Width="100"
-                                            Height="40"
-                                            Content="Shift"
-                                            Style="{StaticResource LargeKeyStyle}" />
-                                        <Button
-                                            x:Name="Z"
-                                            Width="50"
-                                            Height="40"
-                                            Content="Z"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="X"
-                                            Width="50"
-                                            Height="40"
-                                            Content="X"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="C"
-                                            Width="50"
-                                            Height="40"
-                                            Content="C"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="V"
-                                            Width="50"
-                                            Height="40"
-                                            Content="V"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="B"
-                                            Width="50"
-                                            Height="40"
-                                            Content="B"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="N"
-                                            Width="50"
-                                            Height="40"
-                                            Content="N"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="M"
-                                            Width="50"
-                                            Height="40"
-                                            Content="M"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="Comma"
-                                            Width="50"
-                                            Height="40"
-                                            Content=",&lt;"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="Period"
-                                            Width="50"
-                                            Height="40"
-                                            Content=".&gt;"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="Slash"
-                                            Width="50"
-                                            Height="40"
-                                            Content="/?"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="RightShift"
-                                            Width="100"
-                                            Height="40"
-                                            Content="Shift"
-                                            Style="{StaticResource LargeKeyStyle}" />
-                                    </StackPanel>
+                <!-- 功能键区域 -->
+                <Border Margin="5" Padding="10" BorderBrush="#FF404040" BorderThickness="1" CornerRadius="8">
+                    <Viewbox MaxWidth="250" MaxHeight="300" Stretch="Uniform" StretchDirection="DownOnly">
+                        <StackPanel>
+                            <!-- Print Screen等 -->
+                            <StackPanel Margin="0,0,0,10" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button x:Name="PrintScreen" Content="Print Screen" Width="80" Height="35" Style="{StaticResource FunctionKeyStyle}" />
+                                <Button x:Name="ScrollLock" Content="Scroll Lock" Width="80" Height="35" Style="{StaticResource FunctionKeyStyle}" />
+                                <Button x:Name="Pause" Content="Pause" Width="60" Height="35" Style="{StaticResource FunctionKeyStyle}" />
+                            </StackPanel>
 
-                                    <!--  第六行：底部控制键  -->
-                                    <StackPanel
-                                        Grid.Row="5"
-                                        Margin="0,10,0,0"
-                                        HorizontalAlignment="Center"
-                                        Orientation="Horizontal">
-                                        <Button
-                                            x:Name="LeftCtrl"
-                                            Width="70"
-                                            Height="40"
-                                            Content="Ctrl"
-                                            Style="{StaticResource LargeKeyStyle}" />
-                                        <Button
-                                            x:Name="LeftWin"
-                                            Width="60"
-                                            Height="40"
-                                            Content="Win"
-                                            Style="{StaticResource LargeKeyStyle}" />
-                                        <Button
-                                            x:Name="LeftAlt"
-                                            Width="60"
-                                            Height="40"
-                                            Content="Alt"
-                                            Style="{StaticResource LargeKeyStyle}" />
-                                        <Button
-                                            x:Name="Space"
-                                            Width="300"
-                                            Height="40"
-                                            Content="Space"
-                                            Style="{StaticResource LargeKeyStyle}" />
-                                        <Button
-                                            x:Name="RightAlt"
-                                            Width="60"
-                                            Height="40"
-                                            Content="Alt"
-                                            Style="{StaticResource LargeKeyStyle}" />
-                                        <Button
-                                            x:Name="Menu"
-                                            Width="60"
-                                            Height="40"
-                                            Content="Menu"
-                                            Style="{StaticResource LargeKeyStyle}" />
-                                        <Button
-                                            x:Name="RightCtrl"
-                                            Width="70"
-                                            Height="40"
-                                            Content="Ctrl"
-                                            Style="{StaticResource LargeKeyStyle}" />
-                                    </StackPanel>
-                                </Grid>
-                            </Viewbox>
-                        </Border>
+                            <!-- Insert Home PageUp -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button x:Name="Insert" Content="Insert" Width="60" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="Home" Content="Home" Width="60" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="PageUp" Content="Page Up" Width="60" Style="{StaticResource KeyStyle}" />
+                            </StackPanel>
 
-                        <!--  中间功能键区域  -->
-                        <Border
-                            Margin="5"
-                            Padding="10"
-                            BorderBrush="#FF404040"
-                            BorderThickness="1"
-                            CornerRadius="8">
-                            <Viewbox
-                                MaxWidth="250"
-                                MaxHeight="300"
-                                Stretch="Uniform"
-                                StretchDirection="DownOnly">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="45" />
-                                        <RowDefinition Height="45" />
-                                        <RowDefinition Height="45" />
-                                        <RowDefinition Height="45" />
-                                        <RowDefinition Height="45" />
-                                        <RowDefinition Height="60" />
-                                    </Grid.RowDefinitions>
+                            <!-- Delete End PageDown -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button x:Name="Delete" Content="Delete" Width="60" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="End" Content="End" Width="60" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="PageDown" Content="Page Down" Width="60" Style="{StaticResource KeyStyle}" />
+                            </StackPanel>
 
-                                    <!--  第一行：Print Screen, Scroll Lock, Pause  -->
-                                    <StackPanel
-                                        Grid.Row="0"
-                                        Margin="0,0,0,10"
-                                        HorizontalAlignment="Center"
-                                        Orientation="Horizontal">
-                                        <Button
-                                            x:Name="PrintScreen"
-                                            Width="80"
-                                            Height="35"
-                                            Content="Print Screen"
-                                            Style="{StaticResource FunctionKeyStyle}" />
-                                        <Button
-                                            x:Name="ScrollLock"
-                                            Width="80"
-                                            Height="35"
-                                            Content="Scroll Lock"
-                                            Style="{StaticResource FunctionKeyStyle}" />
-                                        <Button
-                                            x:Name="Pause"
-                                            Width="60"
-                                            Height="35"
-                                            Content="Pause"
-                                            Style="{StaticResource FunctionKeyStyle}" />
-                                    </StackPanel>
+                            <!-- 方向键 -->
+                            <StackPanel Margin="0,40,0,0" HorizontalAlignment="Center">
+                                <Button x:Name="Up" Content="↑" Style="{StaticResource KeyStyle}" />
+                                <StackPanel Orientation="Horizontal">
+                                    <Button x:Name="Left" Content="←" Style="{StaticResource KeyStyle}" />
+                                    <Button x:Name="Down" Content="↓" Style="{StaticResource KeyStyle}" />
+                                    <Button x:Name="Right" Content="→" Style="{StaticResource KeyStyle}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Viewbox>
+                </Border>
 
-                                    <!--  第二行：Insert, Home, Page Up  -->
-                                    <StackPanel
-                                        Grid.Row="1"
-                                        HorizontalAlignment="Center"
-                                        Orientation="Horizontal">
-                                        <Button
-                                            x:Name="Insert"
-                                            Width="60"
-                                            Height="40"
-                                            Content="Insert"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="Home"
-                                            Width="60"
-                                            Height="40"
-                                            Content="Home"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="PageUp"
-                                            Width="60"
-                                            Height="40"
-                                            Content="Page Up"
-                                            Style="{StaticResource KeyStyle}" />
-                                    </StackPanel>
+                <!-- 小键盘区域 -->
+                <Border Margin="5" Padding="10" BorderBrush="#FF404040" BorderThickness="1" CornerRadius="8">
+                    <Viewbox MaxWidth="280" MaxHeight="300" Stretch="Uniform" StretchDirection="DownOnly">
+                        <StackPanel>
+                            <!-- 小键盘功能键 -->
+                            <StackPanel Margin="0,0,0,10" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button x:Name="NumLock" Content="Num Lock" Width="70" Height="35" Style="{StaticResource FunctionKeyStyle}" />
+                                <Button x:Name="NumDivide" Content="/" Height="35" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="NumMultiply" Content="*" Height="35" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="NumSubtract" Content="-" Height="35" Style="{StaticResource KeyStyle}" />
+                            </StackPanel>
 
-                                    <!--  第三行：Delete, End, Page Down  -->
-                                    <StackPanel
-                                        Grid.Row="2"
-                                        HorizontalAlignment="Center"
-                                        Orientation="Horizontal">
-                                        <Button
-                                            x:Name="Delete"
-                                            Width="60"
-                                            Height="40"
-                                            Content="Delete"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="End"
-                                            Width="60"
-                                            Height="40"
-                                            Content="End"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="PageDown"
-                                            Width="60"
-                                            Height="40"
-                                            Content="Page Down"
-                                            Style="{StaticResource KeyStyle}" />
-                                    </StackPanel>
+                            <!-- 小键盘数字区 -->
+                            <Grid HorizontalAlignment="Center">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
 
-                                    <!--  第四行：空白  -->
-                                    <StackPanel
-                                        Grid.Row="3"
-                                        HorizontalAlignment="Center"
-                                        Orientation="Horizontal">
-                                        <Rectangle
-                                            Width="180"
-                                            Height="40"
-                                            Fill="Transparent" />
-                                    </StackPanel>
+                                <!-- 第一行 -->
+                                <Button x:Name="NumPad7" Grid.Row="0" Grid.Column="0" Content="7" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="NumPad8" Grid.Row="0" Grid.Column="1" Content="8" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="NumPad9" Grid.Row="0" Grid.Column="2" Content="9" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="NumAdd" Grid.Row="0" Grid.RowSpan="2" Grid.Column="3" Content="+" Height="85" Style="{StaticResource KeyStyle}" />
 
-                                    <!--  第五行：方向键  -->
-                                    <Grid Grid.Row="4" HorizontalAlignment="Center">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="40" />
-                                        </Grid.RowDefinitions>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="60" />
-                                            <ColumnDefinition Width="60" />
-                                            <ColumnDefinition Width="60" />
-                                        </Grid.ColumnDefinitions>
+                                <!-- 第二行 -->
+                                <Button x:Name="NumPad4" Grid.Row="1" Grid.Column="0" Content="4" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="NumPad5" Grid.Row="1" Grid.Column="1" Content="5" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="NumPad6" Grid.Row="1" Grid.Column="2" Content="6" Style="{StaticResource KeyStyle}" />
 
-                                        <Button
-                                            x:Name="Up"
-                                            Grid.Column="1"
-                                            Width="50"
-                                            Height="40"
-                                            Content="↑"
-                                            Style="{StaticResource KeyStyle}" />
-                                    </Grid>
+                                <!-- 第三行 -->
+                                <Button x:Name="NumPad1" Grid.Row="2" Grid.Column="0" Content="1" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="NumPad2" Grid.Row="2" Grid.Column="1" Content="2" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="NumPad3" Grid.Row="2" Grid.Column="2" Content="3" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="NumEnter" Grid.Row="2" Grid.RowSpan="2" Grid.Column="3" Content="Enter" Height="85" Style="{StaticResource LargeKeyStyle}" />
 
-                                    <!--  第六行：方向键下排  -->
-                                    <Grid
-                                        Grid.Row="5"
-                                        Margin="0,0,0,0"
-                                        HorizontalAlignment="Center">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="40" />
-                                        </Grid.RowDefinitions>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="60" />
-                                            <ColumnDefinition Width="60" />
-                                            <ColumnDefinition Width="60" />
-                                        </Grid.ColumnDefinitions>
+                                <!-- 第四行 -->
+                                <Button x:Name="NumPad0" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Content="0" Width="104" Style="{StaticResource KeyStyle}" />
+                                <Button x:Name="NumDecimal" Grid.Row="3" Grid.Column="2" Content="." Style="{StaticResource KeyStyle}" />
+                            </Grid>
+                        </StackPanel>
+                    </Viewbox>
+                </Border>
 
-                                        <Button
-                                            x:Name="Left"
-                                            Grid.Column="0"
-                                            Width="50"
-                                            Height="40"
-                                            Content="←"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="Down"
-                                            Grid.Column="1"
-                                            Width="50"
-                                            Height="40"
-                                            Content="↓"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="Right"
-                                            Grid.Column="2"
-                                            Width="50"
-                                            Height="40"
-                                            Content="→"
-                                            Style="{StaticResource KeyStyle}" />
-                                    </Grid>
-                                </Grid>
-                            </Viewbox>
-                        </Border>
-
-                        <!--  小键盘区域  -->
-                        <Border
-                            Margin="5"
-                            Padding="10"
-                            BorderBrush="#FF404040"
-                            BorderThickness="1"
-                            CornerRadius="8">
-                            <Viewbox
-                                MaxWidth="280"
-                                MaxHeight="300"
-                                Stretch="Uniform"
-                                StretchDirection="DownOnly">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="45" />
-                                        <RowDefinition Height="45" />
-                                        <RowDefinition Height="45" />
-                                        <RowDefinition Height="45" />
-                                        <RowDefinition Height="45" />
-                                        <RowDefinition Height="60" />
-                                    </Grid.RowDefinitions>
-
-                                    <!--  小键盘第一行：功能键  -->
-                                    <StackPanel
-                                        Grid.Row="0"
-                                        Margin="0,0,0,10"
-                                        HorizontalAlignment="Center"
-                                        Orientation="Horizontal">
-                                        <Button
-                                            x:Name="NumLock"
-                                            Width="70"
-                                            Height="35"
-                                            Content="Num Lock"
-                                            Style="{StaticResource FunctionKeyStyle}" />
-                                        <Button
-                                            x:Name="NumDivide"
-                                            Width="50"
-                                            Height="35"
-                                            Content="/"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="NumMultiply"
-                                            Width="50"
-                                            Height="35"
-                                            Content="*"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="NumSubtract"
-                                            Width="50"
-                                            Height="35"
-                                            Content="-"
-                                            Style="{StaticResource KeyStyle}" />
-                                    </StackPanel>
-
-                                    <!--  小键盘用Grid布局以正确处理跨行按键  -->
-                                    <Grid
-                                        Grid.Row="1"
-                                        Grid.RowSpan="4"
-                                        HorizontalAlignment="Center">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="45" />
-                                            <RowDefinition Height="45" />
-                                            <RowDefinition Height="45" />
-                                            <RowDefinition Height="45" />
-                                        </Grid.RowDefinitions>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="54" />
-                                            <ColumnDefinition Width="54" />
-                                            <ColumnDefinition Width="54" />
-                                            <ColumnDefinition Width="54" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <!--  第一行：7 8 9 +  -->
-                                        <Button
-                                            x:Name="NumPad7"
-                                            Grid.Row="0"
-                                            Grid.Column="0"
-                                            Width="50"
-                                            Height="40"
-                                            Content="7"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="NumPad8"
-                                            Grid.Row="0"
-                                            Grid.Column="1"
-                                            Width="50"
-                                            Height="40"
-                                            Content="8"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="NumPad9"
-                                            Grid.Row="0"
-                                            Grid.Column="2"
-                                            Width="50"
-                                            Height="40"
-                                            Content="9"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="NumAdd"
-                                            Grid.Row="0"
-                                            Grid.RowSpan="2"
-                                            Grid.Column="3"
-                                            Width="50"
-                                            Height="89"
-                                            Content="+"
-                                            Style="{StaticResource KeyStyle}" />
-
-                                        <!--  第二行：4 5 6  -->
-                                        <Button
-                                            x:Name="NumPad4"
-                                            Grid.Row="1"
-                                            Grid.Column="0"
-                                            Width="50"
-                                            Height="40"
-                                            Content="4"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="NumPad5"
-                                            Grid.Row="1"
-                                            Grid.Column="1"
-                                            Width="50"
-                                            Height="40"
-                                            Content="5"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="NumPad6"
-                                            Grid.Row="1"
-                                            Grid.Column="2"
-                                            Width="50"
-                                            Height="40"
-                                            Content="6"
-                                            Style="{StaticResource KeyStyle}" />
-
-                                        <!--  第三行：1 2 3 Enter  -->
-                                        <Button
-                                            x:Name="NumPad1"
-                                            Grid.Row="2"
-                                            Grid.Column="0"
-                                            Width="50"
-                                            Height="40"
-                                            Content="1"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="NumPad2"
-                                            Grid.Row="2"
-                                            Grid.Column="1"
-                                            Width="50"
-                                            Height="40"
-                                            Content="2"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="NumPad3"
-                                            Grid.Row="2"
-                                            Grid.Column="2"
-                                            Width="50"
-                                            Height="40"
-                                            Content="3"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="NumEnter"
-                                            Grid.Row="2"
-                                            Grid.RowSpan="2"
-                                            Grid.Column="3"
-                                            Width="50"
-                                            Height="89"
-                                            Content="Enter"
-                                            Style="{StaticResource LargeKeyStyle}" />
-
-                                        <!--  第四行：0 .  -->
-                                        <Button
-                                            x:Name="NumPad0"
-                                            Grid.Row="3"
-                                            Grid.Column="0"
-                                            Grid.ColumnSpan="2"
-                                            Width="104"
-                                            Height="40"
-                                            Content="0"
-                                            Style="{StaticResource KeyStyle}" />
-                                        <Button
-                                            x:Name="NumDecimal"
-                                            Grid.Row="3"
-                                            Grid.Column="2"
-                                            Width="50"
-                                            Height="40"
-                                            Content="."
-                                            Style="{StaticResource KeyStyle}" />
-                                    </Grid>
-
-                                    <!--  小键盘第六行：空白对齐  -->
-                                    <StackPanel
-                                        Grid.Row="5"
-                                        Margin="0,10,0,0"
-                                        HorizontalAlignment="Center"
-                                        Orientation="Horizontal">
-                                        <Rectangle
-                                            Width="220"
-                                            Height="40"
-                                            Fill="Transparent" />
-                                    </StackPanel>
-                                </Grid>
-                            </Viewbox>
-                        </Border>
-
-                    </WrapPanel>
-                </ScrollViewer>
-            </Grid>
+            </WrapPanel>
         </ScrollViewer>
 
-        <!--  状态栏  -->
-        <Border
-            Grid.Row="2"
-            Background="#FF252526"
-            BorderBrush="#FF404040"
-            BorderThickness="0,1,0,0">
+        <!-- 状态栏 -->
+        <Border Grid.Row="2" Background="#FF252526" BorderBrush="#FF404040" BorderThickness="0,1,0,0">
             <Grid>
                 <TextBlock
                     x:Name="StatusText"
@@ -998,8 +312,7 @@
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
                     FontSize="12"
-                    Foreground="#FF007ACC"
-                    Text="" />
+                    Foreground="#FF007ACC" />
             </Grid>
         </Border>
     </Grid>
