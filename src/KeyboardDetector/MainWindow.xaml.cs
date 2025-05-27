@@ -18,12 +18,15 @@ namespace KeyboardDetector
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly Dictionary<Key, Button> keyButtonMap = new Dictionary<Key, Button>();
+        private readonly Dictionary<Key, System.Windows.Controls.Button> keyButtonMap = new Dictionary<Key, System.Windows.Controls.Button>();
+        private readonly Dictionary<string, System.Windows.Controls.Button> extendedKeyButtonMap = new Dictionary<string, System.Windows.Controls.Button>();
         private readonly HashSet<Key> pressedKeys = new HashSet<Key>();
+        private readonly HashSet<string> pressedExtendedKeys = new HashSet<string>();
         private readonly SolidColorBrush normalBrush = new SolidColorBrush(Color.FromRgb(45, 45, 48));
         private readonly SolidColorBrush pressedBrush = new SolidColorBrush(Color.FromRgb(0, 122, 204));
         private readonly SolidColorBrush functionKeyBrush = new SolidColorBrush(Color.FromRgb(64, 64, 64));
         private readonly DispatcherTimer resetTimer = new DispatcherTimer();
+        private readonly GlobalKeyboardHook globalKeyboardHook = new GlobalKeyboardHook();
 
         public MainWindow()
         {
@@ -31,6 +34,7 @@ namespace KeyboardDetector
             InitializeKeyMap();
             InitializeEvents();
             InitializeTimer();
+            InitializeGlobalKeyboardHook();
             
             // 设置窗口可以接收键盘焦点
             this.Focusable = true;
@@ -40,11 +44,13 @@ namespace KeyboardDetector
         private void InitializeKeyMap()
         {
             keyButtonMap.Clear();
+            extendedKeyButtonMap.Clear();
             
-            // 添加键映射
-            var keyMappings = new Dictionary<Key, Button>
+            // 添加普通键映射
+            var keyMappings = new Dictionary<Key, System.Windows.Controls.Button>
             {
-                // 功能键
+                // ESC键和功能键
+                { Key.Escape, Escape },
                 { Key.F1, F1 }, { Key.F2, F2 }, { Key.F3, F3 }, { Key.F4, F4 },
                 { Key.F5, F5 }, { Key.F6, F6 }, { Key.F7, F7 }, { Key.F8, F8 },
                 { Key.F9, F9 }, { Key.F10, F10 }, { Key.F11, F11 }, { Key.F12, F12 },
@@ -60,13 +66,14 @@ namespace KeyboardDetector
                 { Key.Q, Q }, { Key.W, W }, { Key.E, E }, { Key.R, R }, { Key.T, T },
                 { Key.Y, Y }, { Key.U, U }, { Key.I, I }, { Key.O, O }, { Key.P, P },
                 { Key.OemOpenBrackets, LeftBracket }, { Key.OemCloseBrackets, RightBracket },
-                { Key.OemBackslash, Backslash },
+                { Key.OemBackslash, Backslash }, { Key.Oem5, Backslash },
 
                 // ASDF行
                 { Key.CapsLock, CapsLock },
                 { Key.A, A }, { Key.S, S }, { Key.D, D }, { Key.F, F }, { Key.G, G },
                 { Key.H, H }, { Key.J, J }, { Key.K, K }, { Key.L, L },
-                { Key.OemSemicolon, Semicolon }, { Key.OemQuotes, Quote }, { Key.Enter, Enter },
+                { Key.OemSemicolon, Semicolon }, { Key.OemQuotes, Quote },
+                // 注意：Enter键在扩展键映射中处理
 
                 // ZXCV行
                 { Key.LeftShift, LeftShift }, { Key.RightShift, RightShift },
@@ -76,7 +83,7 @@ namespace KeyboardDetector
 
                 // 底部控制键
                 { Key.LeftCtrl, LeftCtrl }, { Key.RightCtrl, RightCtrl },
-                { Key.LWin, LeftWin }, { Key.RWin, RightWin },
+                { Key.LWin, LeftWin },
                 { Key.LeftAlt, LeftAlt }, { Key.RightAlt, RightAlt },
                 { Key.Space, Space }, { Key.Apps, Menu },
 
@@ -95,21 +102,46 @@ namespace KeyboardDetector
                 { Key.NumPad0, NumPad0 }, { Key.Decimal, NumDecimal }
             };
             
-            // 将映射添加到主字典
+            // 将普通映射添加到主字典
             foreach (var kvp in keyMappings)
             {
                 keyButtonMap[kvp.Key] = kvp.Value;
+            }
+            
+            // 添加扩展键映射（区分Enter键）
+            var extendedKeyMappings = new Dictionary<string, System.Windows.Controls.Button>
+            {
+                { "MainEnter", Enter },      // 主键盘Enter（非扩展键）
+                { "NumPadEnter", NumEnter }, // 小键盘Enter（扩展键）
+                { "LeftCtrl", LeftCtrl },    // 左Ctrl（非扩展键）
+                { "RightCtrl", RightCtrl },  // 右Ctrl（扩展键）
+                { "LeftAlt", LeftAlt },      // 左Alt（非扩展键）
+                { "RightAlt", RightAlt }     // 右Alt（扩展键）
+            };
+            
+            // 将扩展映射添加到扩展字典
+            foreach (var kvp in extendedKeyMappings)
+            {
+                extendedKeyButtonMap[kvp.Key] = kvp.Value;
             }
         }
 
         private void InitializeEvents()
         {
-            // 监听全局键盘事件
+            // 监听窗口级键盘事件（保留作为备用）
             this.KeyDown += MainWindow_KeyDown;
             this.KeyUp += MainWindow_KeyUp;
             
             // 确保窗口获取焦点时能接收键盘事件
             this.MouseDown += (s, e) => this.Focus();
+        }
+
+        private void InitializeGlobalKeyboardHook()
+        {
+            // 监听全局键盘事件
+            globalKeyboardHook.KeyDown += GlobalKeyboardHook_KeyDown;
+            globalKeyboardHook.KeyUp += GlobalKeyboardHook_KeyUp;
+            globalKeyboardHook.StartHook();
         }
 
         private void InitializeTimer()
@@ -118,7 +150,74 @@ namespace KeyboardDetector
             resetTimer.Tick += ResetTimer_Tick;
         }
 
-        private void MainWindow_KeyDown(object sender, KeyEventArgs e)
+        private void GlobalKeyboardHook_KeyDown(object sender, GlobalKeyPressEventArgs e)
+        {
+            // 使用Dispatcher确保在UI线程上执行
+            Dispatcher.Invoke(() =>
+            {
+                string uniqueKeyId = e.GetUniqueKeyId();
+                
+                // 对于需要区分扩展键的按键，使用扩展键逻辑
+                if (extendedKeyButtonMap.ContainsKey(uniqueKeyId))
+                {
+                    // 如果扩展键已经被按下，忽略重复的KeyDown事件
+                    if (pressedExtendedKeys.Contains(uniqueKeyId))
+                        return;
+                        
+                    pressedExtendedKeys.Add(uniqueKeyId);
+                    HighlightExtendedKey(uniqueKeyId, true);
+                    UpdateStatusInfoExtended(e, true);
+                }
+                else
+                {
+                    // 如果键已经被按下，忽略重复的KeyDown事件
+                    if (pressedKeys.Contains(e.Key))
+                        return;
+                        
+                    pressedKeys.Add(e.Key);
+                    HighlightKey(e.Key, true);
+                    UpdateStatusInfo(e.Key, true);
+                }
+                
+                // 停止重置计时器，因为有键被按下
+                resetTimer.Stop();
+            });
+        }
+
+        private void GlobalKeyboardHook_KeyUp(object sender, GlobalKeyPressEventArgs e)
+        {
+            // 使用Dispatcher确保在UI线程上执行
+            Dispatcher.Invoke(() =>
+            {
+                string uniqueKeyId = e.GetUniqueKeyId();
+                
+                // 对于需要区分扩展键的按键，使用扩展键逻辑
+                if (extendedKeyButtonMap.ContainsKey(uniqueKeyId))
+                {
+                    // 移除已释放的扩展键
+                    if (pressedExtendedKeys.Remove(uniqueKeyId))
+                    {
+                        HighlightExtendedKey(uniqueKeyId, false);
+                    }
+                }
+                else
+                {
+                    // 移除已释放的键
+                    if (pressedKeys.Remove(e.Key))
+                    {
+                        HighlightKey(e.Key, false);
+                    }
+                }
+                
+                // 如果没有其他键被按下，启动重置计时器
+                if (pressedKeys.Count == 0 && pressedExtendedKeys.Count == 0)
+                {
+                    resetTimer.Start();
+                }
+            });
+        }
+
+        private void MainWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             // 如果键已经被按下，忽略重复的KeyDown事件
             if (pressedKeys.Contains(e.Key))
@@ -132,7 +231,7 @@ namespace KeyboardDetector
             resetTimer.Stop();
         }
 
-        private void MainWindow_KeyUp(object sender, KeyEventArgs e)
+        private void MainWindow_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
             // 移除已释放的键
             if (pressedKeys.Remove(e.Key))
@@ -151,7 +250,7 @@ namespace KeyboardDetector
         {
             resetTimer.Stop();
             
-            // 只重置没有被按下的键
+            // 只重置没有被按下的普通键
             foreach (var kvp in keyButtonMap)
             {
                 if (!pressedKeys.Contains(kvp.Key))
@@ -160,17 +259,43 @@ namespace KeyboardDetector
                 }
             }
             
-            // 如果没有键被按下，重置状态文本
-            if (pressedKeys.Count == 0)
+            // 只重置没有被按下的扩展键
+            foreach (var kvp in extendedKeyButtonMap)
             {
-                StatusText.Text = "就绪 - 按任意键开始检测";
+                if (!pressedExtendedKeys.Contains(kvp.Key))
+                {
+                    ResetKeyAppearance(kvp.Value);
+                }
+            }
+            
+            // 如果没有键被按下，重置状态文本
+            if (pressedKeys.Count == 0 && pressedExtendedKeys.Count == 0)
+            {
+                StatusText.Text = "全局按键检测已启动 - 可以切换到其他窗口测试";
                 KeyInfoText.Text = "";
             }
         }
 
         private void HighlightKey(Key key, bool isPressed)
         {
-            if (keyButtonMap.TryGetValue(key, out Button button))
+            if (keyButtonMap.TryGetValue(key, out System.Windows.Controls.Button button))
+            {
+                if (isPressed)
+                {
+                    button.Background = pressedBrush;
+                    button.BorderBrush = new SolidColorBrush(Color.FromRgb(0, 122, 204));
+                    button.BorderThickness = new Thickness(2);
+                }
+                else
+                {
+                    ResetKeyAppearance(button);
+                }
+            }
+        }
+        
+        private void HighlightExtendedKey(string uniqueKeyId, bool isPressed)
+        {
+            if (extendedKeyButtonMap.TryGetValue(uniqueKeyId, out System.Windows.Controls.Button button))
             {
                 if (isPressed)
                 {
@@ -185,7 +310,7 @@ namespace KeyboardDetector
             }
         }
 
-        private void ResetKeyAppearance(Button button)
+        private void ResetKeyAppearance(System.Windows.Controls.Button button)
         {
             // 根据按键类型设置正常颜色
             if (button.Style.ToString().Contains("FunctionKeyStyle"))
@@ -206,6 +331,11 @@ namespace KeyboardDetector
             {
                 ResetKeyAppearance(button);
             }
+            
+            foreach (var button in extendedKeyButtonMap.Values)
+            {
+                ResetKeyAppearance(button);
+            }
         }
 
         private void UpdateStatusInfo(Key key, bool isPressed)
@@ -214,6 +344,22 @@ namespace KeyboardDetector
             {
                 StatusText.Text = $"检测到按键: {GetKeyDisplayName(key)}";
                 KeyInfoText.Text = $"键码: {key} | VK: {KeyInterop.VirtualKeyFromKey(key)}";
+                
+                // 调试输出：如果按键没有映射，输出详细信息
+                if (!keyButtonMap.ContainsKey(key))
+                {
+                    System.Diagnostics.Debug.WriteLine($"未映射的按键: {key} (VK: {KeyInterop.VirtualKeyFromKey(key)})");
+                }
+            }
+        }
+        
+        private void UpdateStatusInfoExtended(GlobalKeyPressEventArgs e, bool isPressed)
+        {
+            if (isPressed)
+            {
+                string displayName = GetExtendedKeyDisplayName(e.GetUniqueKeyId());
+                StatusText.Text = $"检测到按键: {displayName}";
+                KeyInfoText.Text = $"键码: {e.Key} | VK: {e.VirtualKeyCode} | 扩展: {(e.IsExtended ? "是" : "否")}";
             }
         }
 
@@ -221,6 +367,7 @@ namespace KeyboardDetector
         {
             return key switch
             {
+                Key.Escape => "ESC键",
                 Key.Space => "空格键",
                 Key.Enter => "回车键",
                 Key.Tab => "制表符键",
@@ -237,6 +384,7 @@ namespace KeyboardDetector
                 Key.OemOpenBrackets => "左中括号键 ([{)",
                 Key.OemCloseBrackets => "右中括号键 (]})",
                 Key.OemBackslash => "反斜杠键 (\\|)",
+                Key.Oem5 => "反斜杠键 (\\|)",
                 Key.OemSemicolon => "分号键 (;:)",
                 Key.OemQuotes => "引号键 ('\")",
                 Key.OemComma => "逗号键 (,<)",
@@ -268,11 +416,39 @@ namespace KeyboardDetector
                 _ => key.ToString()
             };
         }
+        
+        private string GetExtendedKeyDisplayName(string uniqueKeyId)
+        {
+            return uniqueKeyId switch
+            {
+                "MainEnter" => "主键盘回车键",
+                "NumPadEnter" => "小键盘回车键",
+                "LeftCtrl" => "左Ctrl键",
+                "RightCtrl" => "右Ctrl键",
+                "LeftAlt" => "左Alt键",
+                "RightAlt" => "右Alt键",
+                _ => uniqueKeyId
+            };
+        }
 
         protected override void OnActivated(EventArgs e)
         {
             base.OnActivated(e);
             this.Focus();
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            // 清理全局键盘钩子资源
+            globalKeyboardHook.StopHook();
+            globalKeyboardHook.Dispose();
+            base.OnClosed(e);
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            // 在窗口关闭前清理资源
+            globalKeyboardHook.StopHook();
         }
     }
 }
