@@ -10,6 +10,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.Generic;
 using System.Windows.Threading;
+using System.Reflection;
 
 namespace KeyboardDetector
 {
@@ -31,6 +32,7 @@ namespace KeyboardDetector
         public MainWindow()
         {
             InitializeComponent();
+            SetWindowTitle();
             InitializeKeyMap();
             InitializeEvents();
             InitializeTimer();
@@ -39,6 +41,27 @@ namespace KeyboardDetector
             // 设置窗口可以接收键盘焦点
             this.Focusable = true;
             this.Focus();
+        }
+
+        private void SetWindowTitle()
+        {
+            try
+            {
+                // 获取当前程序集
+                Assembly assembly = Assembly.GetExecutingAssembly();
+                
+                // 获取版本信息
+                Version version = assembly.GetName().Version;
+                
+                // 设置窗口标题，包含版本号
+                this.Title = $"键盘检测器 v{version.Major}.{version.Minor}.{version.Build}";
+            }
+            catch (Exception ex)
+            {
+                // 如果获取版本失败，使用默认标题
+                this.Title = "键盘检测器";
+                System.Diagnostics.Debug.WriteLine($"获取版本号失败: {ex.Message}");
+            }
         }
 
         private void InitializeKeyMap()
